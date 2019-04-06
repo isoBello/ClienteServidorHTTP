@@ -22,8 +22,10 @@ public class Cliente {
 	/*Construtor da classe*/
 	
 	/*
-	 * public Cliente(String host, int porta) { super(); this.host = host;
-	 * this.porta = porta; }
+	 * public Cliente(String host, int porta) { 
+	 * 		super(); this.host = host;
+	 * 		this.porta = porta; 
+	 * }
 	 */
 	
 	public static void main(String[] args) throws IOException{
