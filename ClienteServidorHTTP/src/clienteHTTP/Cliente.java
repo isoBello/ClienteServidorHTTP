@@ -16,6 +16,7 @@ public class Cliente {
 	/*
 	 * private String host; private int porta; private static Scanner aux;
 	 */
+	private static String host;
 	private static Socket socket;
 	static String requisicao;
 	
@@ -51,7 +52,7 @@ public class Cliente {
 		url.close();
 		//System.out.println(endereco);
 		String novoHost = endereco.replace("http://", "").replace("https://", "").replace(porta.toString(), "");
-		System.out.println(novoHost);
+		//System.out.println(novoHost);
 		String[] dadosCliente = novoHost.split("/");
 		String arquivoDownload = null;
 		
@@ -62,21 +63,23 @@ public class Cliente {
 		}else {
 			arquivoDownload = dadosCliente[dadosCliente.length - 1];
 		}
-
+		Cliente.host = novoHost;
 		getRequisicaoHTTP(dadosCliente, portaHTTP, arquivoDownload);
 	}
 	
 	/*Método que realiza a requisição HTTP e devolve uma resposta */
 	public static void getRequisicaoHTTP(String[] dados, int porta, String arquivo) throws UnknownHostException, IOException{
 		int inicio = 0, i;
+		String url;
 		try {
 			/*Abre a conexão HTTP*/
 			socket = new Socket(dados[0], porta);
 			PrintWriter saida = new PrintWriter (socket.getOutputStream(), true);
 			Scanner entrada = new Scanner(socket.getInputStream());
+
 			if(socket.isConnected()) {
 				System.out.println("Conexão estabelecida com o servidor "+socket.getInetAddress());
-				if(dados[0].subSequence(dados[0].length() - 2, dados[0].length() - 1).equals("/")) {
+				if(host.subSequence(host.length() - 2, host.length()- 1).equals("/")) {
 					/*Envia a requisição*/
 					saida.println("GET" + dados + " " + versaoHTTP);
 					saida.println("\r\nHost: "+ dados[0]);
