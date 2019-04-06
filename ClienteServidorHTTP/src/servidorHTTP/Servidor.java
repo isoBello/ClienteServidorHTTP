@@ -26,10 +26,7 @@ public class Servidor implements Runnable{
 	static ServerSocket servidor;
 	static BufferedWriter resposta;
 	static Scanner scanner;
-	static String caminho;
-	static String navegador;
-	static String url;
-	static String door;
+
 	public final static String versaoHTTP = "HTTP/1.1";
 	
 	private static final String saidaErro = "<html><head><title>"
@@ -69,7 +66,12 @@ public class Servidor implements Runnable{
 		}
 		url.close();
 		endereco = endereco.replace(porta, "");
+		
+		endereco = endereco + "/";
+		endereco = endereco.replace(" ", "");
+		
 		Servidor.host = endereco;
+		Servidor.porta = portaHTTP;
 		
 		servidor = new ServerSocket(portaHTTP);
 		System.out.println("O Servidor está conectado a porta "+ portaHTTP);
@@ -89,26 +91,7 @@ public class Servidor implements Runnable{
 			resposta = new BufferedWriter( 
 					new OutputStreamWriter( 
 							new BufferedOutputStream(socket.getOutputStream()), "UTF-8")); 
-			Scanner aux = new Scanner(socket.getInputStream());
 			
-			while (aux.hasNextLine()) {
-				String requisicao = aux.nextLine();
-				System.out.println(requisicao);
-				String[] parts = requisicao.split(" ");
-				if (parts.length == 3) {
-					navegador = parts[0];
-					url = parts[1];
-					door = parts[2];
-				} else if (parts.length == 2) {
-					navegador = parts[0];
-					url = parts[1];
-					door = "8080";
-				} else {
-					System.out.println("Você digitou errado!");
-				}
-				break;
-			}
-			//aux.close();
 			GET();
 			resposta.flush();
 			resposta.close();
@@ -119,7 +102,7 @@ public class Servidor implements Runnable{
 	}
 	
 	static public void GET() throws IOException, ClassNotFoundException{
-		String nome = host + caminho;
+		String nome = host;
 		File arquivo = new File(nome);
 		
 		int i, j = 0;

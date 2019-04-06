@@ -3,7 +3,8 @@ package clienteHTTP;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.OutputStream;
+//import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public class Cliente {
 	 * private String host; private int porta; private static Scanner aux;
 	 */
 	private static String host;
+	private static int porta;
 	private static Socket socket;
 	static String requisicao;
 	
@@ -63,36 +65,49 @@ public class Cliente {
 		}else {
 			arquivoDownload = dadosCliente[dadosCliente.length - 1];
 		}
-		Cliente.host = novoHost;
-		getRequisicaoHTTP(dadosCliente, portaHTTP, arquivoDownload);
+		Cliente.host = dadosCliente[0];
+		Cliente.porta = portaHTTP;
+		getRequisicaoHTTP(arquivoDownload);
 	}
 	
 	/*Método que realiza a requisição HTTP e devolve uma resposta */
-	public static void getRequisicaoHTTP(String[] dados, int porta, String arquivo) throws UnknownHostException, IOException{
+	public static void getRequisicaoHTTP(String arquivo) throws UnknownHostException, IOException{
 		int inicio = 0, i;
-		String url;
+		
 		try {
 			/*Abre a conexão HTTP*/
-			socket = new Socket(dados[0], porta);
-			PrintWriter saida = new PrintWriter (socket.getOutputStream(), true);
+			socket = new Socket(host, porta);
+			//PrintWriter saida = new PrintWriter (socket.getOutputStream(), true);
+			String requisicao;
 			Scanner entrada = new Scanner(socket.getInputStream());
 
 			if(socket.isConnected()) {
 				System.out.println("Conexão estabelecida com o servidor "+socket.getInetAddress());
+
 				if(host.subSequence(host.length() - 2, host.length()- 1).equals("/")) {
 					/*Envia a requisição*/
-					saida.println("GET" + dados + " " + versaoHTTP);
-					saida.println("\r\nHost: "+ dados[0]);
-					saida.println("\r\nConnection: Close");
-					saida.println("\r\n");
+					requisicao = "GET " + "/" + versaoHTTP+"\r\n" + "Host: "+ host + "\r\n" + "\r\n"; 
+					
+					/*
+					 * saida.println("GET" + dados + " " + versaoHTTP); saida.println("\r\nHost: "+
+					 * dados[0]); saida.println("\r\nConnection: Close"); saida.println("\r\n");
+					 */
+					 
 					arquivo = arquivo + ".html";
 				}else {
 					/*Envia a requisição*/
-					saida.println("GET" + dados + " " + versaoHTTP);
-					saida.println("\r\nHost: "+ dados[0]);
-					saida.println("\r\nConnection: Close");
-					saida.println("\r\n");
+					requisicao = "GET " + "/" + versaoHTTP + "\r\n" + "Host: "+ host + "\r\n" + "\r\n";
+					/*
+					 * saida.println("GET" + dados + " " + versaoHTTP); saida.println("\r\nHost: "+
+					 * dados[0]); saida.println("\r\nConnection: Close"); saida.println("\r\n");
+					 */
 				}
+				
+				OutputStream resposta = socket.getOutputStream();
+				byte[] bytes = requisicao.getBytes();
+				
+				resposta.write(bytes);
+				resposta.flush();
 				
 				FileWriter arquivoSaida = new FileWriter(new File(arquivo));
 				ArrayList<String> conteudo = new ArrayList<>();
